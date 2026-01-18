@@ -1337,13 +1337,4 @@ SOLVER_TIME_LIMIT = 30    # seconds
 
 ---
 
-**🚀 Ready to optimize your delivery routes? Start with `python main.py`!**
-
-For detailed guidance, see:
-- [QUICK_START.md](QUICK_START.md) - 5-minute quick start guide
-- [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) - Technical summary
-- [PRESENTATION_OUTLINE.md](PRESENTATION_OUTLINE.md) - Presentation guide
-
----
-
 *Last updated: January 2026*
