@@ -235,18 +235,19 @@ class PredictOptimizePipeline:
         print("\n### APPROACH 2: ORACLE (PERFECT INFORMATION) ###")
         scenario_data = scenario_df[scenario_df['scenario_id'] == scenario_id].copy()
         
-        # Use actual values as "predictions"
+        # Use actual values as "predictions" - no upper bounds needed
         scenario_data['predicted_demand'] = scenario_data['actual_demand']
-        scenario_data['demand_upper_bound'] = scenario_data['actual_demand']
+        scenario_data['demand_upper_bound'] = scenario_data['actual_demand']  # Exact, not inflated
         scenario_data['predicted_travel_time'] = scenario_data['actual_travel_time']
         
         optimizer_oracle = DeliveryOptimizer(use_predictions=True)
         routes_oracle = optimizer_oracle.solve(scenario_data, time_limit=30)
         
         if routes_oracle:
-            costs_oracle = optimizer_oracle.calculate_actual_costs(routes_oracle, scenario_data)
-            results_comparison['oracle'] = costs_oracle['total_cost']
-            print(f"\nOracle Total Cost: €{costs_oracle['total_cost']:.2f}")
+            # Oracle should have perfect execution too
+            actual_costs_oracle = self.evaluate_actual_performance(routes_oracle, scenario_data)
+            results_comparison['oracle'] = actual_costs_oracle['total_cost']
+            print(f"\nOracle Total Cost: €{actual_costs_oracle['total_cost']:.2f}")
         
         # Approach 3: Baseline (use historical averages)
         print("\n### APPROACH 3: BASELINE (HISTORICAL AVERAGES) ###")

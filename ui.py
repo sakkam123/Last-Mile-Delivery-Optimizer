@@ -11,18 +11,56 @@ st.write("Optimisation des livraisons last-mile avec prédictions et OR-Tools.")
 # -------------------------------
 # SIDEBAR - paramètres utilisateurs
 # -------------------------------
-st.sidebar.header("🔧 Paramètres utilisateurs")
+st.sidebar.header("⚙️ Configuration du Système")
 
-NUM_VEHICLES = st.sidebar.number_input("Nombre de véhicules", min_value=1, max_value=10, value=3)
-VEHICLE_CAPACITY = st.sidebar.number_input("Capacité véhicule (kg)", min_value=10, max_value=500, value=100)
-WORK_DAY_START = st.sidebar.slider("Début journée (heure)", 0, 24, 8)
-WORK_DAY_END = st.sidebar.slider("Fin journée (heure)", 0, 24, 18)
-SERVICE_TIME = st.sidebar.number_input("Temps service (h)", min_value=0.05, max_value=1.0, value=0.1, step=0.05)
-COST_PER_KM = st.sidebar.number_input("Coût par km (€)", min_value=0.0, max_value=5.0, value=0.5)
-EARLY_PENALTY = st.sidebar.number_input("Pénalité arrivée tôt (€)", min_value=0, max_value=100, value=10)
-LATE_PENALTY = st.sidebar.number_input("Pénalité retard (€)", min_value=0, max_value=100, value=20)
+st.sidebar.markdown("### ✅ Paramètres Modifiables")
+st.sidebar.caption("Ces paramètres peuvent être ajustés")
 
-start_button = st.sidebar.button("Lancer Predict-Then-Optimize")
+NUM_VEHICLES = st.sidebar.number_input("Nombre de véhicules", min_value=1, max_value=10, value=3,
+                                        help="Nombre de véhicules disponibles")
+VEHICLE_CAPACITY = st.sidebar.number_input("Capacité véhicule (kg)", min_value=10, max_value=500, value=250,
+                                            help="Capacité maximale par véhicule")
+MAX_ROUTE_DURATION = st.sidebar.number_input("Durée max route (h)", min_value=4, max_value=16, value=8,
+                                              help="Durée maximale d'une route")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 🕐 Fenêtres Horaires")
+
+WORK_DAY_START = st.sidebar.slider("Début journée (h)", 0, 24, 8,
+                                    help="Heure de début")
+WORK_DAY_END = st.sidebar.slider("Fin journée (h)", 0, 24, 18,
+                                  help="Heure de fin")
+SERVICE_TIME = st.sidebar.number_input("Temps service (min)", min_value=1, max_value=60, value=5, step=1,
+                                        help="Temps moyen par client") / 60
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 💰 Coûts et Pénalités")
+
+COST_PER_KM = st.sidebar.number_input("Coût par km (€)", min_value=0.0, max_value=5.0, value=0.5,
+                                       help="Coût par kilomètre")
+FIXED_VEHICLE_COST = st.sidebar.number_input("Coût fixe véhicule (€)", min_value=0, max_value=200, value=50,
+                                              help="Coût fixe par véhicule")
+EARLY_PENALTY = st.sidebar.number_input("Pénalité tôt (€/h)", min_value=0, max_value=100, value=20,
+                                         help="Pénalité arrivée trop tôt")
+LATE_PENALTY = st.sidebar.number_input("Pénalité retard (€/h)", min_value=0, max_value=100, value=40,
+                                        help="Pénalité arrivée en retard")
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 📊 Scénario de Test")
+st.sidebar.caption("⚠️ Paramètres non modifiables")
+
+scenario_id = st.sidebar.selectbox("Scénario", range(10), index=0,
+                                    help="Scénario de test prédéfini")
+
+st.sidebar.info("""
+**Données fixes du scénario:**
+- Positions des clients
+- Demandes réelles
+- Fenêtres horaires préférées
+""")
+
+st.sidebar.markdown("---")
+start_button = st.sidebar.button("🚀 Lancer l'Optimisation", type="primary", use_container_width=True)
 
 # -------------------------------
 # Charger scénario test
@@ -32,7 +70,7 @@ def load_scenario(scenario_id=0):
     df = pd.read_csv("data/test_scenarios.csv")
     return df[df['scenario_id'] == scenario_id].copy()
 
-scenario_df = load_scenario()
+scenario_df = load_scenario(scenario_id)
 
 st.subheader("📋 Aperçu du scénario")
 st.dataframe(scenario_df.head(10))
@@ -47,10 +85,12 @@ if start_button:
     import config
     config.NUM_VEHICLES = NUM_VEHICLES
     config.VEHICLE_CAPACITY = VEHICLE_CAPACITY
+    config.MAX_ROUTE_DURATION = MAX_ROUTE_DURATION
     config.WORK_DAY_START = WORK_DAY_START
     config.WORK_DAY_END = WORK_DAY_END
     config.SERVICE_TIME = SERVICE_TIME
     config.COST_PER_KM = COST_PER_KM
+    config.FIXED_VEHICLE_COST = FIXED_VEHICLE_COST
     config.EARLY_PENALTY = EARLY_PENALTY
     config.LATE_PENALTY = LATE_PENALTY
 

@@ -69,12 +69,14 @@ def solve_vrp_with_soft_time_windows(manager, routing, data, time_windows, vehic
     time_callback_index = routing.RegisterTransitCallback(time_callback)
     routing.AddDimension(
         time_callback_index,
-        60 * 10,  # allow slack (max 10h)
+        60 * 2,  # allow slack (max 2h) - REDUCED for tighter scheduling
         int(data['max_route_duration'] * 60),  # max route duration in minutes
         False,  # don't force start cumul to zero
         'Time'
     )
     time_dimension = routing.GetDimensionOrDie('Time')
+    # Increase priority on time dimension to respect time windows better
+    time_dimension.SetGlobalSpanCostCoefficient(10)
     
     # ========================================================================
     # APPLY SOFT TIME WINDOWS
@@ -97,12 +99,14 @@ def solve_vrp_with_soft_time_windows(manager, routing, data, time_windows, vehic
     # ========================================================================
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
-        routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
+        routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
     )
     search_parameters.local_search_metaheuristic = (
         routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     )
     search_parameters.time_limit.seconds = 60  # 60s timeout
+    search_parameters.solution_limit = 1000  # Explore more solutions
+    search_parameters.log_search = False  # Disable verbose logging
     
     # ========================================================================
     # SOLVE

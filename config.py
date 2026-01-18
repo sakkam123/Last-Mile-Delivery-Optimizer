@@ -7,23 +7,23 @@ DEPOT_LOCATION = (0, 0)
 
 # Vehicle configuration
 NUM_VEHICLES = 3
-VEHICLE_CAPACITY = 200  # kg → augmenter pour pouvoir livrer la demande robuste
-VEHICLE_SPEED = 50  # km/h → plus rapide pour respecter fenêtres horaires
+VEHICLE_CAPACITY = 250  # kg - increased for robust demand bounds
+VEHICLE_SPEED = 50  # km/h
 
 # Cost parameters
 COST_PER_KM = 0.5  # euros
-EARLY_PENALTY = 5   # euros per hour early → réduire pour que solver accepte
-LATE_PENALTY = 10   # euros per hour late → réduire
+EARLY_PENALTY = 20   # euros per hour early - Balanced to enforce time windows
+LATE_PENALTY = 40   # euros per hour late - Balanced to enforce time windows
 FIXED_VEHICLE_COST = 50  # euros per vehicle used
 
 # Time window parameters
-SERVICE_TIME = 0.05  # heures (≈3 minutes par livraison) → réduit pour gagner du temps
+SERVICE_TIME = 0.083  # hours (5 minutes per delivery - realistic)
 WORK_DAY_START = 8   # 8:00 AM
 WORK_DAY_END = 18    # 6:00 PM
-MAX_ROUTE_DURATION = 12  # heures → allonger pour éviter contraintes strictes
+MAX_ROUTE_DURATION = 8  # hours - tighter to encourage efficient routes
 
 # Grid size for customer locations
-GRID_SIZE = 15  # km x km → plus compact pour réduire distances
+GRID_SIZE = 15  # km x km (compact for realistic urban delivery)
 
 # Data generation parameters
 NUM_HISTORICAL_DAYS = 100
